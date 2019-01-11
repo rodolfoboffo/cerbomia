@@ -38,7 +38,6 @@ class Raiz(object):
             b = random.getrandbits(8)
             byteList.append(b)
         b = bytes(byteList)
-        print(b)
         return Raiz(struct.unpack('f', b)[0])
 
     @staticmethod

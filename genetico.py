@@ -1,3 +1,5 @@
+import random
+
 MAXIMIZACAO = 1
 MINIMIZACAO = 0
 
@@ -17,13 +19,17 @@ class Ranking(object):
     def getPopulacao(self):
         return map(self.getRanking(), lambda i: i[0])
 
+    def __repr__(self):
+        s = ''
+        for i in range(len(self.getRanking())):
+            s += '%d: %s -> %f\n' % (i+1, self.ranking[i][0], self.ranking[i][1])
+        return s
+
 class Genetico(object):
     
-    def __init__(self, tamanhoGenoma, funcaoAdaptacao, populacao, maxmin=MAXIMIZACAO, probMutacao=0.01, probCrossover=0.10):
+    def __init__(self, funcaoAdaptacao, maxmin=MAXIMIZACAO, probMutacao=0.01, probCrossover=0.10):
         self.probMutacao = probMutacao
         self.probCrossover = probCrossover
-        self.populacao = populacao
-        self.tamanhoGenoma = tamanhoGenoma
         self.maxmin=maxmin
         self.funcaoAdaptacao = funcaoAdaptacao
         
@@ -34,12 +40,22 @@ class Genetico(object):
             rankingAdaptacao.adiciona(individuo, valorAdaptacao)
         return rankingAdaptacao
 
-    def getReprGeneticasPopulacao(self):
-        pass
+    def geraMascaraCruzamente(self, nBytes, probCrossover):
+        mascaraCruzamento = 0
+        currentBit = random.randint(0, 1)
+        for i in range(8*nBytes):
+            if random.random() < probCrossover:
+                currentBit
 
     def fazCruzamento(self, populacao, probCrossover):
-        pass
+        tamGenoma = populacao[0].getTamanhoGenoma()
+        
 
-    def evoluir(self, nGeracoes):
+    def evoluir(self, populacao, nGeracoes):
+        if len(populacao) < 2:
+            raise Exception('Impossivel evoluir populacao de tamanho menor que 2')
         for i in range(nGeracoes):
-            ranking = self.validaAdaptacao(self.populacao, self.funcaoAdaptacao, maxmin=self.maxmin)
+            ranking = self.validaAdaptacao(populacao, self.funcaoAdaptacao, maxmin=self.maxmin)
+            print(ranking)
+            novaPopulacao = self.fazCruzamento(ranking.getPopulacao(), self.probCrossover)
+
