@@ -22,7 +22,7 @@ class Raiz(object):
         return struct.calcsize('f')
     
     @staticmethod
-    def getRaizFromReprGenetica(rep):
+    def getFromReprGenetica(rep):
         intList = []
         for i in range(struct.calcsize('f')):
             intByte = rep & 0xFF

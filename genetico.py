@@ -17,8 +17,9 @@ class Ranking(object):
         return self.ranking[:]
     
     def getPopulacao(self):
-        return map(self.getRanking(), lambda i: i[0])
-
+        p = list(map(lambda i: i[0], self.getRanking()))
+        return p
+        
     def __repr__(self):
         s = ''
         for i in range(len(self.getRanking())):
@@ -40,16 +41,40 @@ class Genetico(object):
             rankingAdaptacao.adiciona(individuo, valorAdaptacao)
         return rankingAdaptacao
 
-    def geraMascaraCruzamente(self, nBytes, probCrossover):
+    def geraMascaraCruzamento(self, nBytes, probCrossover):
         mascaraCruzamento = 0
         currentBit = random.randint(0, 1)
-        for i in range(8*nBytes):
+        nBits = 8*nBytes
+        for i in range(nBits):
             if random.random() < probCrossover:
-                currentBit
-
-    def fazCruzamento(self, populacao, probCrossover):
-        tamGenoma = populacao[0].getTamanhoGenoma()
+                currentBit ^= 1
+            mascaraCruzamento = mascaraCruzamento | currentBit
+            mascaraCruzamento = mascaraCruzamento if i == (nBits - 1) else mascaraCruzamento << 1 
+        return mascaraCruzamento
         
+        
+    def fazCruzamentoPopulacao(self, populacao, probCrossover):
+        filhos = []
+        for i in range(len(populacao)-1):
+            individuoA = populacao[i]
+            individuoB = populacao[i+1]
+
+    def fazCruzamentoIndividuos(self, individuo1, individuo2, probCrossover):
+        tamGenoma = individuo1.getTamanhoGenoma()
+        mascara = self.geraMascaraCruzamento(tamGenoma, probCrossover)
+        print('{0:032b}'.format(mascara))
+        rep1 = individuo1.getReprGenetica()
+        rep2 = individuo2.getReprGenetica()
+        print('{0:032b}'.format(rep1))
+        print('{0:032b}'.format(rep2))
+        #(!ab)|ac
+        #(!ac)|ab
+        repFilho1 = (~mascara)&rep1 | mascara&rep2
+        repFilho2 = (~mascara)&rep2 | mascara&rep1
+        print('{0:032b}'.format(repFilho1))
+        print('{0:032b}'.format(repFilho2))
+        return (individuo1.__class__.getFromReprGenetica(repFilho1),
+                individuo1.__class__.getFromReprGenetica(repFilho2))
 
     def evoluir(self, populacao, nGeracoes):
         if len(populacao) < 2:
@@ -57,5 +82,5 @@ class Genetico(object):
         for i in range(nGeracoes):
             ranking = self.validaAdaptacao(populacao, self.funcaoAdaptacao, maxmin=self.maxmin)
             print(ranking)
-            novaPopulacao = self.fazCruzamento(ranking.getPopulacao(), self.probCrossover)
+            novaPopulacao = self.fazCruzamentoPopulacao(ranking.getPopulacao(), self.probCrossover)
 
