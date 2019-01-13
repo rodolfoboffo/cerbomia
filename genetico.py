@@ -28,10 +28,12 @@ class Ranking(object):
 
 class Genetico(object):
     
-    def __init__(self, funcaoAdaptacao, maxmin=MAXIMIZACAO, probMutacao=0.01, probCrossover=0.10):
+    def __init__(self, funcaoAdaptacao, proporcaoFilhos=0.2, manterPais=False, maxmin=MAXIMIZACAO, probMutacao=0.05, probCrossover=0.10):
         self.probMutacao = probMutacao
         self.probCrossover = probCrossover
+        self.proporcaoFilhos = proporcaoFilhos
         self.maxmin=maxmin
+        self.manterPais = manterPais
         self.funcaoAdaptacao = funcaoAdaptacao
         
     def validaAdaptacao(self, populacao, funcaoAdaptacao, maxmin=MAXIMIZACAO):
@@ -41,46 +43,66 @@ class Genetico(object):
             rankingAdaptacao.adiciona(individuo, valorAdaptacao)
         return rankingAdaptacao
 
-    def geraMascaraCruzamento(self, nBytes, probCrossover):
-        mascaraCruzamento = 0
+    def geraMascara(self, nBytes, prob):
+        mascara = 0
         currentBit = random.randint(0, 1)
         nBits = 8*nBytes
         for i in range(nBits):
-            if random.random() < probCrossover:
+            if random.random() < prob:
                 currentBit ^= 1
-            mascaraCruzamento = mascaraCruzamento | currentBit
-            mascaraCruzamento = mascaraCruzamento if i == (nBits - 1) else mascaraCruzamento << 1 
-        return mascaraCruzamento
+            mascara = mascara | currentBit
+            mascara = mascara if i == (nBits - 1) else mascara << 1 
+        return mascara
         
         
-    def fazCruzamentoPopulacao(self, populacao, probCrossover):
-        filhos = []
+    def fazCruzamentoPopulacao(self, populacao, probCrossover, proporcaoFilhos, manterPais):
+        novaGeracao = []
         for i in range(len(populacao)-1):
             individuoA = populacao[i]
             individuoB = populacao[i+1]
+            for j in range(int(len(populacao)*proporcaoFilhos)):
+                filhos = self.fazCruzamentoIndividuos(individuoA, individuoB, probCrossover)
+                novaGeracao += filhos
+                if manterPais:
+                    novaGeracao += [individuoA]
+            if len(novaGeracao) >= len(populacao):
+                break
+        return novaGeracao[:len(populacao)]
 
     def fazCruzamentoIndividuos(self, individuo1, individuo2, probCrossover):
         tamGenoma = individuo1.getTamanhoGenoma()
-        mascara = self.geraMascaraCruzamento(tamGenoma, probCrossover)
-        print('{0:032b}'.format(mascara))
+        mascara = self.geraMascara(tamGenoma, probCrossover)
         rep1 = individuo1.getReprGenetica()
         rep2 = individuo2.getReprGenetica()
-        print('{0:032b}'.format(rep1))
-        print('{0:032b}'.format(rep2))
         #(!ab)|ac
         #(!ac)|ab
         repFilho1 = (~mascara)&rep1 | mascara&rep2
         repFilho2 = (~mascara)&rep2 | mascara&rep1
-        print('{0:032b}'.format(repFilho1))
-        print('{0:032b}'.format(repFilho2))
         return (individuo1.__class__.getFromReprGenetica(repFilho1),
                 individuo1.__class__.getFromReprGenetica(repFilho2))
 
-    def evoluir(self, populacao, nGeracoes):
+    def fazMutacaoPopulacao(self, populacao, probMutacao):
+        novaPopulacao = []
+        for individuo in populacao:
+            novaPopulacao.append(self.fazMutacaoIndividuo(individuo, probMutacao))
+        return novaPopulacao
+
+    def fazMutacaoIndividuo(self, individuo, probMutacao):
+        # !a&b + a&!b
+        tamGenoma = individuo.getTamanhoGenoma()
+        mascara = self.geraMascara(tamGenoma, probMutacao)
+        rep = individuo.getReprGenetica()
+        rep = (~mascara)&rep | mascara&(~rep)
+        return individuo.__class__.getFromReprGenetica(rep)
+
+
+    def evoluir(self, populacao, nGeracoes, epsilon=None):
         if len(populacao) < 2:
             raise Exception('Impossivel evoluir populacao de tamanho menor que 2')
+        ranking = self.validaAdaptacao(populacao, self.funcaoAdaptacao, maxmin=self.maxmin)
         for i in range(nGeracoes):
+            populacao = self.fazCruzamentoPopulacao(ranking.getPopulacao(), self.probCrossover, self.proporcaoFilhos, self.manterPais)
+            populacao = self.fazMutacaoPopulacao(populacao, self.probMutacao)
             ranking = self.validaAdaptacao(populacao, self.funcaoAdaptacao, maxmin=self.maxmin)
-            print(ranking)
-            novaPopulacao = self.fazCruzamentoPopulacao(ranking.getPopulacao(), self.probCrossover)
-
+            if epsilon is not None and epsilon > ranking
+        return ranking
