@@ -1,4 +1,5 @@
 import random
+import logging
 
 MAXIMIZACAO = 1
 MINIMIZACAO = 0
@@ -7,14 +8,22 @@ class Ranking(object):
 
     def __init__(self, maxmin):
         self.ranking = []
+        self.rankingOrdenado = []
         self.maxmin = maxmin
         
     def adiciona(self, individuo, valorAdaptacao):
         self.ranking.append((individuo, valorAdaptacao))
+        self.rankingOrdenado = []
     
     def getRanking(self):
-        self.ranking.sort(key=lambda item: item[1] if self.maxmin == MINIMIZACAO else -item[1])
-        return self.ranking[:]
+        if not self.rankingOrdenado:
+            self.ranking.sort(key=lambda item: item[1] if self.maxmin == MINIMIZACAO else -item[1])
+            self.rankingOrdenado = self.ranking[:]
+        return self.rankingOrdenado
+    
+    def isMelhorQue(self, pontuacaoSatisfatoria):
+        r = self.getRanking()
+        return pontuacaoSatisfatoria >= r[0][1] if self.maxmin == MINIMIZACAO else pontuacaoSatisfatoria <= r[0][1]
     
     def getPopulacao(self):
         p = list(map(lambda i: i[0], self.getRanking()))
@@ -96,7 +105,7 @@ class Genetico(object):
         return individuo.__class__.getFromReprGenetica(rep)
 
 
-    def evoluir(self, populacao, nGeracoes, epsilon=None):
+    def evoluir(self, populacao, nGeracoes, pontuacaoSatisfatoria=None):
         if len(populacao) < 2:
             raise Exception('Impossivel evoluir populacao de tamanho menor que 2')
         ranking = self.validaAdaptacao(populacao, self.funcaoAdaptacao, maxmin=self.maxmin)
@@ -104,5 +113,7 @@ class Genetico(object):
             populacao = self.fazCruzamentoPopulacao(ranking.getPopulacao(), self.probCrossover, self.proporcaoFilhos, self.manterPais)
             populacao = self.fazMutacaoPopulacao(populacao, self.probMutacao)
             ranking = self.validaAdaptacao(populacao, self.funcaoAdaptacao, maxmin=self.maxmin)
-            if epsilon is not None and epsilon > ranking
+            if ranking.isMelhorQue(pontuacaoSatisfatoria):
+                logging.info('Número de iterações: %d' % (i+1))
+                return ranking
         return ranking
