@@ -30,9 +30,9 @@ class Raiz(object):
             rep >>= 8
         b = bytes(intList)
         return Raiz(struct.unpack('f', b)[0])
-    
+
     @staticmethod
-    def geraRaizAleatoria():
+    def geraAleatorio():
         byteList = []
         for i in range(struct.calcsize('f')):
             b = random.getrandbits(8)
@@ -41,10 +41,10 @@ class Raiz(object):
         return Raiz(struct.unpack('f', b)[0])
 
     @staticmethod
-    def geraRaizesAleatorias(n):
+    def geraAleatorios(n):
         raizes = []
         for i in range(n):
-            raizes.append(Raiz.geraRaizAleatoria())
+            raizes.append(Raiz.geraAleatorio())
         return raizes
 
 def main():
