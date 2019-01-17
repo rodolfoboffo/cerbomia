@@ -29,11 +29,15 @@ class FeedForwardNet(object):
         if len(self.tiposCamadas) == 0 or len(self.matrizPesos) != len(self.tiposCamadas):
             raise Excpetion('Rede nao esta bem definida para esta entrada')
         for indiceCamada in range(len(self.tiposCamadas)):
+            tipoCamada = tiposCamadas[indiceCamada]
             pesos = self.matrizPesos[indiceCamada]
             desvios = self.matrizDesvios[indiceCamada]
             saida = []
             for indiceNeuronioReceptor in range(len(pesos)):
                 elemento = 0.0
                 for indiceNeuronioTransm in range(len(pesos[indiceNeuronioReceptor])):
-                    
-        
+                    elemento += pesos[indiceNeuronioReceptor][indiceNeuronioTransm] * entrada[indiceNeuronioTransm] + desvios[indiceNeuronioTransm]
+                elemento = self.funcaoAtivacao(tipoCamada, elemento)
+                saida.append(elemento)
+            entrada = saida
+        return saida
