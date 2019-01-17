@@ -21,16 +21,5 @@ def main():
     ranking = g.evoluir(pop, 10000, pontuacaoSatisfatoria=pow(0.000001, 2))
     print(ranking.getPopulacao()[0])
 
-    a = Aleatorio(
-        f,
-        maxmin=MINIMIZACAO,
-        )
-    ranking = a.iterar(pop, 10000, pontuacaoSatisfatoria=pow(0.000001, 2))
-
-    print(ranking.getPopulacao()[0])
-    #print('{0:032b}'.format(g.geraMascaraCruzamento(4, 0.1)))
-    #g.fazCruzamentoIndividuos(pop[0], pop[1], 0.1)
-
-
 if __name__ == '__main__':
     main()
