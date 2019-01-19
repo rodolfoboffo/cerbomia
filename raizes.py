@@ -8,9 +8,16 @@ class Raiz(object):
         
     def __repr__(self):
         return str(self.f)
-    
+
+    def getValor(self):
+        return self.f
+
+    @staticmethod
+    def getFormatoStruct():
+        return 'f'
+
     def getReprGenetica(self):
-        packed = bytearray(struct.pack('f', self.f))
+        packed = bytearray(struct.pack(self.getFormatoStruct(), self.f))
         intRepr = 0
         for i in range(len(packed)):
             intRepr |= packed[i]
@@ -19,7 +26,7 @@ class Raiz(object):
     
     @staticmethod
     def getTamanhoGenoma():
-        return struct.calcsize('f')
+        return struct.calcsize(Raiz.getFormatoStruct())
     
     @staticmethod
     def getFromReprGenetica(rep):
@@ -29,7 +36,7 @@ class Raiz(object):
             intList.insert(0, intByte)
             rep >>= 8
         b = bytes(intList)
-        return Raiz(struct.unpack('f', b)[0])
+        return Raiz(struct.unpack(Raiz.getFormatoStruct(), b)[0])
 
     @staticmethod
     def geraAleatorio():

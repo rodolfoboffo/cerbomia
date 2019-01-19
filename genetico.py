@@ -47,8 +47,8 @@ class Genetico(object):
         #(!ac)|ab
         repFilho1 = (~mascara)&rep1 | mascara&rep2
         repFilho2 = (~mascara)&rep2 | mascara&rep1
-        return (individuo1.__class__.getFromReprGenetica(repFilho1),
-                individuo1.__class__.getFromReprGenetica(repFilho2))
+        return (individuo1.getFromReprGenetica(repFilho1),
+                individuo1.getFromReprGenetica(repFilho2))
 
     def fazMutacaoPopulacao(self, populacao, probMutacao):
         novaPopulacao = []

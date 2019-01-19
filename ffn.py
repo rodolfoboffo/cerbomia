@@ -1,23 +1,30 @@
 import math
+import struct
+import random
 
 CAMADA_RELU = 0
 CAMADA_SOFTMAX = 1
+CAMADA_ENTRADA = -1
 
-class FFDBuilder(object):
+class FFNBuilder(object):
     
     def __init__(self):
-        self.nosEntrada = 1
         self.camadas = []
 
-    def nosEntrada(self, n):
-        self.nosEntrada = n
+    def adicionaCamadaEntrada(self, numeroNeuronios):
+        self.camadas.insert(0, (numeroNeuronios, CAMADA_ENTRADA))
         return self
     
     def adicionaCamada(self, numeroNeuronios, tipo):
-        self.camadas += [(nuneroNeuronios, tipo)]
+        self.camadas += [(numeroNeuronios, tipo)]
         return self
-        
+
+    
+
     def constroi(self):
+        tipos = list(map(lambda camada: camada[1]), self.camadas)
+        pesos = []
+        desvios = []
         return FeedForwardNet()
 
 
@@ -50,7 +57,7 @@ class FeedForwardNet(object):
 
     def alimenta(self, entrada):
         if len(self.tiposCamadas) == 0 or len(self.matrizPesos) != len(self.tiposCamadas):
-            raise Excpetion('Rede nao esta bem definida para esta entrada')
+            raise Exception('Rede nao esta bem definida para esta entrada')
         
         for indiceCamada in range(len(self.tiposCamadas)):
             saida = []
@@ -67,3 +74,5 @@ class FeedForwardNet(object):
             saida = funcaoAtivacao(saida)
             entrada = saida
         return saida
+
+if __name__ == '__main__':

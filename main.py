@@ -7,7 +7,7 @@ from ranking import MINIMIZACAO, MAXIMIZACAO
 
 def main():
     logging.getLogger().setLevel(logging.INFO)
-    f = lambda r: pow((r.f - 300512.0), 2)
+    f = lambda r: pow((r.getValor() - 300512.0), 2)
 
     pop = Raiz.geraAleatorios(50)
     g = Genetico(
