@@ -19,13 +19,34 @@ class FFNBuilder(object):
         self.camadas += [(numeroNeuronios, tipo)]
         return self
 
-    
-
     def constroi(self):
         tipos = list(map(lambda camada: camada[1]), self.camadas)
         pesos = []
         desvios = []
         return FeedForwardNet()
+
+    # def getFromReprGenetica(rep):
+    #     intList = []
+    #     for i in range(struct.calcsize('f')):
+    #         intByte = rep & 0xFF
+    #         intList.insert(0, intByte)
+    #         rep >>= 8
+    #     b = bytes(intList)
+    #     return Raiz(struct.unpack(Raiz.getFormatoStruct(), b)[0])
+
+    # def geraAleatorio(self):
+    #     byteList = []
+    #     for i in range(struct.calcsize('f')):
+    #         b = random.getrandbits(8)
+    #         byteList.append(b)
+    #     b = bytes(byteList)
+    #     return Raiz(struct.unpack('f', b)[0])
+
+    def geraAleatorios(self, n):
+        nets = []
+        for i in range(n):
+            nets.append(self.geraAleatorio())
+        return nets
 
 
 class FeedForwardNet(object):

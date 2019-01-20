@@ -1,6 +1,6 @@
 import terreno
 import logging
-from raizes import Raiz
+from raizes import Raiz, RaizBuilder
 from aleatorio import Aleatorio
 from genetico import Genetico
 from ranking import MINIMIZACAO, MAXIMIZACAO
@@ -9,8 +9,10 @@ def main():
     logging.getLogger().setLevel(logging.INFO)
     f = lambda r: pow((r.getValor() - 300512.0), 2)
 
-    pop = Raiz.geraAleatorios(50)
+    builder = RaizBuilder()
+    pop = builder.geraAleatorios(50)
     g = Genetico(
+        builder,
         f,
         proporcaoFilhos=0.3,
         manterPais=True,

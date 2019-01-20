@@ -1,6 +1,31 @@
 import struct
 import random
 
+class RaizBuilder(object):
+
+    def getFromReprGenetica(self, rep):
+        intList = []
+        for i in range(struct.calcsize('f')):
+            intByte = rep & 0xFF
+            intList.insert(0, intByte)
+            rep >>= 8
+        b = bytes(intList)
+        return Raiz(struct.unpack(Raiz.getFormatoStruct(), b)[0])
+
+    def geraAleatorio(self):
+        byteList = []
+        for i in range(struct.calcsize('f')):
+            b = random.getrandbits(8)
+            byteList.append(b)
+        b = bytes(byteList)
+        return Raiz(struct.unpack('f', b)[0])
+
+    def geraAleatorios(self, n):
+        raizes = []
+        for i in range(n):
+            raizes.append(self.geraAleatorio())
+        return raizes
+
 class Raiz(object):
     
     def __init__(self, f):
@@ -27,32 +52,6 @@ class Raiz(object):
     @staticmethod
     def getTamanhoGenoma():
         return struct.calcsize(Raiz.getFormatoStruct())
-    
-    @staticmethod
-    def getFromReprGenetica(rep):
-        intList = []
-        for i in range(struct.calcsize('f')):
-            intByte = rep & 0xFF
-            intList.insert(0, intByte)
-            rep >>= 8
-        b = bytes(intList)
-        return Raiz(struct.unpack(Raiz.getFormatoStruct(), b)[0])
-
-    @staticmethod
-    def geraAleatorio():
-        byteList = []
-        for i in range(struct.calcsize('f')):
-            b = random.getrandbits(8)
-            byteList.append(b)
-        b = bytes(byteList)
-        return Raiz(struct.unpack('f', b)[0])
-
-    @staticmethod
-    def geraAleatorios(n):
-        raizes = []
-        for i in range(n):
-            raizes.append(Raiz.geraAleatorio())
-        return raizes
 
 def main():
     r = Raiz.geraRaizAleatoria()
