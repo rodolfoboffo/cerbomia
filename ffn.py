@@ -1,6 +1,7 @@
 import math
 import struct
 import random
+import logging
 
 CAMADA_RELU = 0
 CAMADA_SOFTMAX = 1
@@ -19,15 +20,38 @@ class FFNBuilder(object):
         self.camadas += [(numeroNeuronios, tipo)]
         return self
 
-    def getFromReprGenetica(rep):
-        intList = []
+    def getFromReprGenetica(self, rep):
         nFloats = 0
-        for i in range(struct.calcsize('f')):
+        for i in range(1, len(self.camadas)):
+            nFloats += self.camadas[i][0] + self.camadas[i][0] * self.camadas[i-1][0]
+
+        intList = []
+        for i in range(struct.calcsize('f' * nFloats)):
             intByte = rep & 0xFF
             intList.insert(0, intByte)
             rep >>= 8
         b = bytes(intList)
-        return Raiz(struct.unpack(Raiz.getFormatoStruct(), b)[0])
+        floats = list(struct.unpack('f' * nFloats, b))
+
+        tipos = list(map(lambda camada: camada[1], self.camadas[1:]))
+        pesos = []
+        desvios = []
+        for i in range(1, len(self.camadas)):
+            pCamada = []
+            for j in range(self.camadas[i][0]):
+                pNeuronio = []
+                for k in range(self.camadas[i-1][0]):
+                    pNeuronio.append(floats.pop(0))
+                pCamada.append(pNeuronio)
+            pesos.append(pCamada)
+
+        for i in range(1, len(self.camadas)):
+            dCamada = []
+            for j in range(self.camadas[i][0]):
+                dCamada.append(floats.pop(0))
+            desvios.append(dCamada)
+        return FeedForwardNet(tipos, pesos, desvios)
+
 
     def geraAleatorio(self):
         tipos = list(map(lambda camada: camada[1], self.camadas[1:]))
@@ -59,6 +83,11 @@ class FeedForwardNet(object):
         self.tiposCamadas = tiposCamadas
         self.matrizPesos = matrizPesos
         self.matrizDesvios = matrizDesvios
+
+    def __eq__(self, other):
+        return self.tiposCamadas == other.tiposCamadas and \
+               self.matrizPesos == other.matrizPesos and \
+               self.matrizDesvios == other.matrizDesvios
 
     def getFuncaoAtivacao(self, tipo):
         if tipo == CAMADA_RELU:
@@ -103,12 +132,12 @@ class FeedForwardNet(object):
     def getReprGenetica(self):
         floatsPesos = []
         floatsDesvios = []
-        for i in range(len(self.pesos)):
-            floatsDesvios += self.desvios[i]
-            for j in range(len(self.pesos[i])):
-                floatsPesos += self.pesos[i][j]
+        for i in range(len(self.matrizPesos)):
+            floatsDesvios += self.matrizDesvios[i]
+            for j in range(len(self.matrizPesos[i])):
+                floatsPesos += self.matrizPesos[i][j]
         nFloats = len(floatsPesos) + len(floatsDesvios)
-        packed = bytearray(struct.pack(nFloats * 'f', floatsPesos + floatsDesvios))
+        packed = bytearray(struct.pack(nFloats * 'f', *(floatsPesos + floatsDesvios)))
         intRepr = 0
         for i in range(len(packed)):
             intRepr |= packed[i]

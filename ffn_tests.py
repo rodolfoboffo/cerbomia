@@ -50,7 +50,43 @@ class FFNBuilderTest(unittest.TestCase):
     def test_randomNet(self):
         net = self.builder.geraAleatorio()
         print(net.alimenta([1.0, 2.0]))
-        
+
+
+class FFNBuilderTest2(unittest.TestCase):
+
+    def setUp(self):
+        self.builder = FFNBuilder()
+        self.builder.adicionaCamadaEntrada(2)
+        self.builder.adicionaCamada(3, CAMADA_RELU)
+        self.builder.adicionaCamada(2, CAMADA_SOFTMAX)
+
+        tipos = [
+            CAMADA_RELU,
+            CAMADA_SOFTMAX
+        ]
+        pesos = [
+            [
+                [2.0, 1.0],
+                [3.0, 2.0],
+                [1.0, 1.0]
+            ],
+            [
+                [1.0, 1.0, 1.0],
+                [2.0, 1.0, 0.0]
+            ]
+        ]
+
+        desvios = [
+            [1.0, 0.0, 0.0],
+            [0.0, 0.0]
+        ]
+
+        self.ffn = FeedForwardNet(tipos, pesos, desvios)
+
+    def test_packUnpack(self):
+        rep = self.ffn.getReprGenetica()
+        newFfn = self.builder.getFromReprGenetica(rep)
+        self.assertEqual(self.ffn, newFfn, 'Redes são diferentes')
 
 if __name__ == '__main__':
     unittest.main()
