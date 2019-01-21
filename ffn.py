@@ -19,28 +19,32 @@ class FFNBuilder(object):
         self.camadas += [(numeroNeuronios, tipo)]
         return self
 
-    def constroi(self):
-        tipos = list(map(lambda camada: camada[1]), self.camadas)
+    def getFromReprGenetica(rep):
+        intList = []
+        nFloats = 0
+        for i in range(struct.calcsize('f')):
+            intByte = rep & 0xFF
+            intList.insert(0, intByte)
+            rep >>= 8
+        b = bytes(intList)
+        return Raiz(struct.unpack(Raiz.getFormatoStruct(), b)[0])
+
+    def geraAleatorio(self):
+        tipos = list(map(lambda camada: camada[1], self.camadas[1:]))
         pesos = []
         desvios = []
-        return FeedForwardNet()
-
-    # def getFromReprGenetica(rep):
-    #     intList = []
-    #     for i in range(struct.calcsize('f')):
-    #         intByte = rep & 0xFF
-    #         intList.insert(0, intByte)
-    #         rep >>= 8
-    #     b = bytes(intList)
-    #     return Raiz(struct.unpack(Raiz.getFormatoStruct(), b)[0])
-
-    # def geraAleatorio(self):
-    #     byteList = []
-    #     for i in range(struct.calcsize('f')):
-    #         b = random.getrandbits(8)
-    #         byteList.append(b)
-    #     b = bytes(byteList)
-    #     return Raiz(struct.unpack('f', b)[0])
+        for i in range(1, len(self.camadas)):
+            pCamada = []
+            dCamada = []
+            for j in range(self.camadas[i][0]):
+                dCamada.append(random.uniform(-1.0, 1.0))
+                pNeuronio = []
+                for k in range(self.camadas[i-1][0]):
+                    pNeuronio.append(random.uniform(-1.0, 1.0))
+                pCamada.append(pNeuronio)
+            pesos.append(pCamada)
+            desvios.append(dCamada)
+        return FeedForwardNet(tipos, pesos, desvios)
 
     def geraAleatorios(self, n):
         nets = []
@@ -96,4 +100,17 @@ class FeedForwardNet(object):
             entrada = saida
         return saida
 
-if __name__ == '__main__':
+    def getReprGenetica(self):
+        floatsPesos = []
+        floatsDesvios = []
+        for i in range(len(self.pesos)):
+            floatsDesvios += self.desvios[i]
+            for j in range(len(self.pesos[i])):
+                floatsPesos += self.pesos[i][j]
+        nFloats = len(floatsPesos) + len(floatsDesvios)
+        packed = bytearray(struct.pack(nFloats * 'f', floatsPesos + floatsDesvios))
+        intRepr = 0
+        for i in range(len(packed)):
+            intRepr |= packed[i]
+            intRepr = intRepr << 8 if i != (len(packed) - 1) else intRepr
+        return intRepr

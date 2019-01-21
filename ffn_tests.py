@@ -1,4 +1,4 @@
-from ffn import FeedForwardNet, CAMADA_SOFTMAX, CAMADA_RELU
+from ffn import FFNBuilder, FeedForwardNet, CAMADA_SOFTMAX, CAMADA_RELU
 import unittest
 import math
 
@@ -39,7 +39,18 @@ class FeedForwardNetTest(unittest.TestCase):
         ]
         self.assertEqual(saida, saidaEsperada, 'Saida diferente do esperado')
 
-
+class FFNBuilderTest(unittest.TestCase):
+    
+    def setUp(self):
+        self.builder = FFNBuilder()
+        self.builder.adicionaCamadaEntrada(2)
+        self.builder.adicionaCamada(3, CAMADA_RELU)
+        self.builder.adicionaCamada(2, CAMADA_SOFTMAX)
+        
+    def test_randomNet(self):
+        net = self.builder.geraAleatorio()
+        print(net.alimenta([1.0, 2.0]))
+        
 
 if __name__ == '__main__':
     unittest.main()
