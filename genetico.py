@@ -40,7 +40,7 @@ class Genetico(object):
         return novaGeracao[:len(populacao)]
 
     def fazCruzamentoIndividuos(self, individuo1, individuo2, probCrossover, individuoBuilder):
-        tamGenoma = individuo1.getTamanhoGenoma()
+        tamGenoma = individuoBuilder.getTamanhoGenoma()
         mascara = self.geraMascara(tamGenoma, probCrossover)
         rep1 = individuo1.getReprGenetica()
         rep2 = individuo2.getReprGenetica()
@@ -59,7 +59,7 @@ class Genetico(object):
 
     def fazMutacaoIndividuo(self, individuo, probMutacao, individuoBuilder):
         # !a&b + a&!b
-        tamGenoma = individuo.getTamanhoGenoma()
+        tamGenoma = individuoBuilder.getTamanhoGenoma()
         mascara = self.geraMascara(tamGenoma, probMutacao)
         rep = individuo.getReprGenetica()
         rep = (~mascara)&rep | mascara&(~rep)

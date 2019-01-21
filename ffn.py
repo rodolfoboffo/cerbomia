@@ -11,6 +11,7 @@ class FFNBuilder(object):
     
     def __init__(self):
         self.camadas = []
+        self.formatoStruct = None
 
     def adicionaCamadaEntrada(self, numeroNeuronios):
         self.camadas.insert(0, (numeroNeuronios, CAMADA_ENTRADA))
@@ -20,18 +21,26 @@ class FFNBuilder(object):
         self.camadas += [(numeroNeuronios, tipo)]
         return self
 
-    def getFromReprGenetica(self, rep):
-        nFloats = 0
-        for i in range(1, len(self.camadas)):
-            nFloats += self.camadas[i][0] + self.camadas[i][0] * self.camadas[i-1][0]
+    def getTamanhoGenoma(self):
+        return struct.calcsize(self.getFormatoStruct())
 
+    def getFormatoStruct(self):
+        if self.formatoStruct is None:
+            nFloats = 0
+            for i in range(1, len(self.camadas)):
+                nFloats += self.camadas[i][0] + self.camadas[i][0] * self.camadas[i-1][0]
+            self.formatoStruct = 'f' * nFloats
+        return self.formatoStruct
+
+    def getFromReprGenetica(self, rep):
+        
         intList = []
-        for i in range(struct.calcsize('f' * nFloats)):
+        for i in range(struct.calcsize(self.getFormatoStruct())):
             intByte = rep & 0xFF
             intList.insert(0, intByte)
             rep >>= 8
         b = bytes(intList)
-        floats = list(struct.unpack('f' * nFloats, b))
+        floats = list(struct.unpack(self.getFormatoStruct(), b))
 
         tipos = list(map(lambda camada: camada[1], self.camadas[1:]))
         pesos = []
@@ -61,10 +70,10 @@ class FFNBuilder(object):
             pCamada = []
             dCamada = []
             for j in range(self.camadas[i][0]):
-                dCamada.append(random.uniform(-1.0, 1.0))
+                dCamada.append(random.uniform(-100.0, 100.0))
                 pNeuronio = []
                 for k in range(self.camadas[i-1][0]):
-                    pNeuronio.append(random.uniform(-1.0, 1.0))
+                    pNeuronio.append(random.uniform(-100.0, 100.0))
                 pCamada.append(pNeuronio)
             pesos.append(pCamada)
             desvios.append(dCamada)
@@ -129,6 +138,7 @@ class FeedForwardNet(object):
             entrada = saida
         return saida
 
+    
     def getReprGenetica(self):
         floatsPesos = []
         floatsDesvios = []

@@ -3,6 +3,12 @@ import random
 
 class RaizBuilder(object):
 
+    def getTamanhoGenoma(self):
+        return struct.calcsize(self.getFormatoStruct())
+
+    def getFormatoStruct(self):
+        return 'f'
+
     def getFromReprGenetica(self, rep):
         intList = []
         for i in range(struct.calcsize('f')):
@@ -37,22 +43,14 @@ class Raiz(object):
     def getValor(self):
         return self.f
 
-    @staticmethod
-    def getFormatoStruct():
-        return 'f'
-
     def getReprGenetica(self):
-        packed = bytearray(struct.pack(self.getFormatoStruct(), self.f))
+        packed = bytearray(struct.pack('f', self.f))
         intRepr = 0
         for i in range(len(packed)):
             intRepr |= packed[i]
             intRepr = intRepr << 8 if i != (len(packed) - 1) else intRepr
         return intRepr
     
-    @staticmethod
-    def getTamanhoGenoma():
-        return struct.calcsize(Raiz.getFormatoStruct())
-
 def main():
     r = Raiz.geraRaizAleatoria()
     print(r)
