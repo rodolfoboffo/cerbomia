@@ -25,7 +25,7 @@ class Genetico(object):
         return mascara
         
         
-    def fazCruzamentoPopulacao(self, populacao, probCrossover, proporcaoFilhos, manterPais, individuoBuilder):
+    def fazCruzamentoPopulacao(self, populacao, probCrossover, proporcaoFilhos, manterPais, individuoBuilder, tamanhoGeracao):
         novaGeracao = []
         for i in range(len(populacao)-1):
             individuoA = populacao[i]
@@ -35,9 +35,9 @@ class Genetico(object):
                 novaGeracao += filhos
                 if manterPais:
                     novaGeracao += [individuoA]
-            if len(novaGeracao) >= len(populacao):
+            if len(novaGeracao) >= tamanhoGeracao:
                 break
-        return novaGeracao[:len(populacao)]
+        return novaGeracao[:tamanhoGeracao]
 
     def fazCruzamentoIndividuos(self, individuo1, individuo2, probCrossover, individuoBuilder):
         tamGenoma = individuoBuilder.getTamanhoGenoma()
@@ -69,11 +69,13 @@ class Genetico(object):
     def evoluir(self, populacao, nGeracoes, pontuacaoSatisfatoria=None):
         if len(populacao) < 2:
             raise Exception('Impossivel evoluir populacao de tamanho menor que 2')
+        self.tamanhoPopulacaoInicial = len(populacao)
         ranking = Ranking.validaInstancias(populacao, self.funcaoAdaptacao, maxmin=self.maxmin)
         for i in range(nGeracoes):
-            populacao = self.fazCruzamentoPopulacao(ranking.getPopulacao(), self.probCrossover, self.proporcaoFilhos, self.manterPais, self.individuoBuilder)
+            populacao = self.fazCruzamentoPopulacao(ranking.getPopulacao(), self.probCrossover, self.proporcaoFilhos, self.manterPais, self.individuoBuilder, self.tamanhoPopulacaoInicial)
             populacao = self.fazMutacaoPopulacao(populacao, self.probMutacao, self.individuoBuilder)
             ranking = Ranking.validaInstancias(populacao, self.funcaoAdaptacao, maxmin=self.maxmin)
+            logging.info('Ranking: %s' % ranking.getRanking()[0][1])
             if pontuacaoSatisfatoria is not None and ranking.isMelhorQue(pontuacaoSatisfatoria):
                 logging.info('Número de iterações: %d' % (i+1))
                 return ranking

@@ -5,6 +5,7 @@ import logging
 
 CAMADA_RELU = 0
 CAMADA_SOFTMAX = 1
+CAMADA_LINEAR = 2
 CAMADA_ENTRADA = -1
 
 class FFNBuilder(object):
@@ -103,8 +104,14 @@ class FeedForwardNet(object):
             return FeedForwardNet.relu
         elif tipo == CAMADA_SOFTMAX:
             return FeedForwardNet.softmax
+        elif tipo == CAMADA_LINEAR:
+            return FeedForwardNet.linear
         else:
             raise Exception('Tipo de camada não disponível')
+
+    @staticmethod
+    def linear(vetor):
+        return vetor[:]
 
     @staticmethod
     def relu(vetor):

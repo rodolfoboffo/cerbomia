@@ -1,3 +1,5 @@
+import math
+
 MAXIMIZACAO = 1
 MINIMIZACAO = 0
 
@@ -15,7 +17,7 @@ class Ranking(object):
     def getRanking(self):
         if not self.rankingOrdenado:
             self.ranking.sort(key=lambda item: item[1] if self.maxmin == MINIMIZACAO else -item[1])
-            self.rankingOrdenado = self.ranking[:]
+            self.rankingOrdenado = list(filter(lambda row: not math.isnan(row[1]), self.ranking[:]))
         return self.rankingOrdenado
 
     def isMelhorQue(self, pontuacaoSatisfatoria):
