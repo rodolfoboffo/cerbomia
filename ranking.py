@@ -15,7 +15,7 @@ class Ranking(object):
         self.rankingOrdenado = []
 
     def getRanking(self):
-        if not self.rankingOrdenado:
+        if len(self.rankingOrdenado) == 0:
             self.ranking.sort(key=lambda item: item[1] if self.maxmin == MINIMIZACAO else -item[1])
             self.rankingOrdenado = list(filter(lambda row: not math.isnan(row[1]), self.ranking[:]))
         return self.rankingOrdenado

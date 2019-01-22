@@ -23,7 +23,7 @@ def main():
     logging.getLogger().setLevel(logging.INFO)
 
     # builder = RaizBuilder()
-    # pop = builder.geraAleatorios(50)
+    # pop = builder.geraAleatorios(20)
     # g = Genetico(
     #     builder,
     #     raizFuncaoObjetivo,
@@ -31,27 +31,27 @@ def main():
     #     manterPais=True,
     #     maxmin=MINIMIZACAO,
     #     probMutacao=0.1,
-    #     probCrossover=0.3
+    #     probCrossover=0.7
     #     )
     # ranking = g.evoluir(pop, 10000, pontuacaoSatisfatoria=pow(0.000001, 2))
     # print(ranking.getPopulacao()[0])
     
     builder = FFNBuilder()
     builder.adicionaCamadaEntrada(1) \
-        .adicionaCamada(3, CAMADA_RELU) \
-        .adicionaCamada(3, CAMADA_RELU) \
+        .adicionaCamada(2, CAMADA_RELU) \
+        .adicionaCamada(2, CAMADA_RELU) \
         .adicionaCamada(1, CAMADA_LINEAR)
-    pop = builder.geraAleatorios(50)
+    pop = builder.geraAleatorios(20)
     g = Genetico(
         builder,
         ffnFuncaoObjetivo,
         proporcaoFilhos=0.3,
         manterPais=True,
         maxmin=MINIMIZACAO,
-        probMutacao=0.1,
-        probCrossover=0.3
+        probMutacao=0.4,
+        probCrossover=0.7
         )
-    ranking = g.evoluir(pop, 1000, pontuacaoSatisfatoria=10.0)
+    ranking = g.evoluir(pop, 100000, pontuacaoSatisfatoria=10.0)
     print(ranking.getRanking()[0])
 
 if __name__ == '__main__':

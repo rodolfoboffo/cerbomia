@@ -1,5 +1,6 @@
 import random
 import logging
+import math
 from ranking import Ranking, MINIMIZACAO, MAXIMIZACAO
 
 class Genetico(object):
@@ -25,7 +26,7 @@ class Genetico(object):
         return mascara
         
         
-    def fazCruzamentoPopulacao(self, populacao, probCrossover, proporcaoFilhos, manterPais, individuoBuilder, tamanhoGeracao):
+    def fazCruzamentoPopulacao(self, populacao, probCrossover, proporcaoFilhos, individuoBuilder, tamanhoMaximoGeracao):
         novaGeracao = []
         for i in range(len(populacao)-1):
             individuoA = populacao[i]
@@ -33,11 +34,9 @@ class Genetico(object):
             for j in range(int(len(populacao)*proporcaoFilhos)):
                 filhos = self.fazCruzamentoIndividuos(individuoA, individuoB, probCrossover, individuoBuilder)
                 novaGeracao += filhos
-                if manterPais:
-                    novaGeracao += [individuoA]
-            if len(novaGeracao) >= tamanhoGeracao:
-                break
-        return novaGeracao[:tamanhoGeracao]
+                if len(novaGeracao) >= tamanhoMaximoGeracao:
+                    break
+        return populacao, novaGeracao
 
     def fazCruzamentoIndividuos(self, individuo1, individuo2, probCrossover, individuoBuilder):
         tamGenoma = individuoBuilder.getTamanhoGenoma()
@@ -72,10 +71,11 @@ class Genetico(object):
         self.tamanhoPopulacaoInicial = len(populacao)
         ranking = Ranking.validaInstancias(populacao, self.funcaoAdaptacao, maxmin=self.maxmin)
         for i in range(nGeracoes):
-            populacao = self.fazCruzamentoPopulacao(ranking.getPopulacao(), self.probCrossover, self.proporcaoFilhos, self.manterPais, self.individuoBuilder, self.tamanhoPopulacaoInicial)
-            populacao = self.fazMutacaoPopulacao(populacao, self.probMutacao, self.individuoBuilder)
+            populacaoInicial, novaGeracao = self.fazCruzamentoPopulacao(ranking.getPopulacao()[:self.tamanhoPopulacaoInicial], self.probCrossover, self.proporcaoFilhos, self.individuoBuilder, self.tamanhoPopulacaoInicial)
+            novaGeracao = self.fazMutacaoPopulacao(novaGeracao, self.probMutacao, self.individuoBuilder)
+            populacao = populacaoInicial + novaGeracao if self.manterPais else novaGeracao
             ranking = Ranking.validaInstancias(populacao, self.funcaoAdaptacao, maxmin=self.maxmin)
-            logging.info('Ranking: %s' % ranking.getRanking()[0][1])
+            logging.info('%s: Ranking: %s' % (i, ranking.getRanking()[0][1]))
             if pontuacaoSatisfatoria is not None and ranking.isMelhorQue(pontuacaoSatisfatoria):
                 logging.info('Número de iterações: %d' % (i+1))
                 return ranking

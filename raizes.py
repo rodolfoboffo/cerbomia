@@ -16,7 +16,7 @@ class RaizBuilder(object):
             intList.insert(0, intByte)
             rep >>= 8
         b = bytes(intList)
-        return Raiz(struct.unpack(Raiz.getFormatoStruct(), b)[0])
+        return Raiz(struct.unpack(self.getFormatoStruct(), b)[0])
 
     def geraAleatorio(self):
         byteList = []
@@ -39,6 +39,9 @@ class Raiz(object):
         
     def __repr__(self):
         return str(self.f)
+
+    def getFormatoStruct(self):
+        return 'f'
 
     def getValor(self):
         return self.f
