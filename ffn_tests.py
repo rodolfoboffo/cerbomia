@@ -1,3 +1,4 @@
+from decimal import Decimal
 from ffn import FFNBuilder, FeedForwardNet, CAMADA_SOFTMAX, CAMADA_RELU
 import unittest
 import math
@@ -11,31 +12,31 @@ class FeedForwardNetTest(unittest.TestCase):
         ]
         pesos = [
             [
-                [2.0, 1.0],
-                [3.0, 2.0],
-                [1.0, 1.0]
+                [Decimal(2), Decimal(1)],
+                [Decimal(3), Decimal(2)],
+                [Decimal(1), Decimal(1)]
             ],
             [
-                [1.0, 1.0, 1.0],
-                [2.0, 1.0, 0.0]
+                [Decimal(1), Decimal(1), Decimal(1)],
+                [2, 1, 0]
             ]
         ]
 
         desvios = [
-            [1.0, 0.0, 0.0],
-            [0.0, 0.0]
+            [1, 0, 0],
+            [0, 0]
         ]
 
         self.ffn = FeedForwardNet(tipos, pesos, desvios)
 
     def test_avaliaSaida(self):
-        entrada = [1.0, 2.0]
+        entrada = [Decimal(1), Decimal(2)]
         saida = self.ffn.alimenta(entrada)
         #[5.0, 7.0, 3.0]
         #[15.0, 17.0]
         saidaEsperada = [
-            math.exp(15.0) / (math.exp(15.0) + math.exp(17.0)),
-            math.exp(17.0) / (math.exp(15.0) + math.exp(17.0))
+            Decimal(15).exp() / (Decimal(15).exp() + Decimal(17).exp()),
+            Decimal(17).exp() / (Decimal(15).exp() + Decimal(17).exp()),
         ]
         self.assertEqual(saida, saidaEsperada, 'Saida diferente do esperado')
 
@@ -49,7 +50,7 @@ class FFNBuilderTest(unittest.TestCase):
 
     def test_randomNet(self):
         net = self.builder.geraAleatorio()
-        print(net.alimenta([1.0, 2.0]))
+        print(net.alimenta([Decimal(1), Decimal(2)]))
 
 
 class FFNBuilderTest2(unittest.TestCase):

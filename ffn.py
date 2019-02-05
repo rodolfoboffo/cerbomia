@@ -2,6 +2,8 @@ import math
 import struct
 import random
 import logging
+from decimal import Decimal
+from mymath import FuncaoVetorial
 
 CAMADA_RELU = 0
 CAMADA_SOFTMAX = 1
@@ -71,10 +73,10 @@ class FFNBuilder(object):
             pCamada = []
             dCamada = []
             for j in range(self.camadas[i][0]):
-                dCamada.append(random.uniform(-100.0, 100.0))
+                dCamada.append(Decimal(str(random.uniform(-100.0, 100.0))))
                 pNeuronio = []
                 for k in range(self.camadas[i-1][0]):
-                    pNeuronio.append(random.uniform(-100.0, 100.0))
+                    pNeuronio.append(Decimal(str(random.uniform(-100.0, 100.0))))
                 pCamada.append(pNeuronio)
             pesos.append(pCamada)
             desvios.append(dCamada)
@@ -115,12 +117,12 @@ class FeedForwardNet(object):
 
     @staticmethod
     def relu(vetor):
-        f = lambda v: 0.0 if v < 0.0 else v
+        f = lambda v: Decimal(0) if v < 0 else v
         return list(map(f, vetor))
         
     @staticmethod
     def softmax(vetor):
-        vetor = list(map(math.exp, vetor))
+        vetor = list(map(lambda x: x.exp(), vetor))
         soma = sum(vetor)
         vetor = list(map(lambda v: v / soma, vetor))
         return vetor
@@ -136,7 +138,7 @@ class FeedForwardNet(object):
             pesos = self.matrizPesos[indiceCamada]
             desvios = self.matrizDesvios[indiceCamada]
             for indiceNeuronioReceptor in range(len(pesos)):
-                elemento = 0.0
+                elemento = Decimal(0)
                 for indiceNeuronioTransm in range(len(pesos[indiceNeuronioReceptor])):
                     elemento += pesos[indiceNeuronioReceptor][indiceNeuronioTransm] * entrada[indiceNeuronioTransm]
                 elemento += desvios[indiceNeuronioReceptor]
