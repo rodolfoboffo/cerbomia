@@ -3,7 +3,7 @@ import struct
 import random
 import logging
 from decimal import Decimal
-from mymath import FuncaoVetorial
+from mymath import FuncaoVetorial, Relu, Identidade, Softmax
 
 CAMADA_RELU = 0
 CAMADA_SOFTMAX = 1
@@ -103,29 +103,13 @@ class FeedForwardNet(object):
 
     def getFuncaoAtivacao(self, tipo):
         if tipo == CAMADA_RELU:
-            return FeedForwardNet.relu
+            return Relu()
         elif tipo == CAMADA_SOFTMAX:
-            return FeedForwardNet.softmax
+            return Softmax()
         elif tipo == CAMADA_LINEAR:
-            return FeedForwardNet.linear
+            return Identidade()
         else:
             raise Exception('Tipo de camada não disponível')
-
-    @staticmethod
-    def linear(vetor):
-        return vetor[:]
-
-    @staticmethod
-    def relu(vetor):
-        f = lambda v: Decimal(0) if v < 0 else v
-        return list(map(f, vetor))
-        
-    @staticmethod
-    def softmax(vetor):
-        vetor = list(map(lambda x: x.exp(), vetor))
-        soma = sum(vetor)
-        vetor = list(map(lambda v: v / soma, vetor))
-        return vetor
 
     def alimenta(self, entrada):
         if len(self.tiposCamadas) == 0 or len(self.matrizPesos) != len(self.tiposCamadas):
@@ -143,10 +127,12 @@ class FeedForwardNet(object):
                     elemento += pesos[indiceNeuronioReceptor][indiceNeuronioTransm] * entrada[indiceNeuronioTransm]
                 elemento += desvios[indiceNeuronioReceptor]
                 saida.append(elemento)
-            saida = funcaoAtivacao(saida)
+            saida = funcaoAtivacao.avalia(saida)
             entrada = saida
         return saida
 
+    def treinaOnLine(self, taxaAprendizado, entrada, esperado, funcaoObjetivo):
+        pass
     
     def getReprGenetica(self):
         floatsPesos = []

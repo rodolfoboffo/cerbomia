@@ -1,5 +1,6 @@
 from decimal import Decimal
 from ffn import FFNBuilder, FeedForwardNet, CAMADA_SOFTMAX, CAMADA_RELU
+from mymath import Relu
 import unittest
 import math
 
@@ -92,8 +93,8 @@ class FFNBuilderTest2(unittest.TestCase):
 class FuncoesAtivacao(unittest.TestCase):
 
     def test_relu(self):
-        self.assertEqual(FeedForwardNet.relu([6.0, -2.0]), [6.0, 0.0], 'ReLu nao está correto.')
-        self.assertEqual(FeedForwardNet.relu([-1.0]), [0.0], 'ReLu nao está correto.')
+        self.assertEqual(Relu().avalia([6.0, -2.0]), [6.0, 0.0], 'ReLu nao está correto.')
+        self.assertEqual(Relu().avalia([-1.0]), [0.0], 'ReLu nao está correto.')
 
 if __name__ == '__main__':
     unittest.main()

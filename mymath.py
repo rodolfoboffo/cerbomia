@@ -42,10 +42,35 @@ class FuncaoVetorial(object):
         derivada = VetorUtil.divisaoHadamard(delta, eps)
         return derivada
 
+class Relu(FuncaoVetorial):
+    def __init__(self):
+        super(Relu, self).__init__(self.funcao)
+
+    def funcao(self, vetor):
+        f = lambda v: Decimal(0) if v < 0 else v
+        return list(map(f, vetor))
+
+class Identidade(FuncaoVetorial):
+    def __init__(self):
+        super(Identidade, self).__init__(self.funcao)
+
+    def funcao(self, vetor):
+        f = lambda v: v
+        return list(map(f, vetor))
+
+class Softmax(FuncaoVetorial):
+    def __init__(self):
+        super(Softmax, self).__init__(self.funcao)
+
+    def funcao(self, vetor):
+        vetor = list(map(lambda x: x.exp(), vetor))
+        soma = sum(vetor)
+        vetor = list(map(lambda v: v / soma, vetor))
+        return vetor
+
 def main():
-    f = lambda v: list(map(lambda x: Decimal(2)*x + Decimal(4) if x > 0 else Decimal(0), v))
-    fv = FuncaoVetorial(f)
-    print(fv.derivadaParcial([Decimal(-1)], 0))
+    fv = Relu()
+    print(fv.avalia([Decimal(-3)]))
 
 if __name__ == '__main__':
     main()
