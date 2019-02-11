@@ -3,7 +3,7 @@ import struct
 import random
 import logging
 from decimal import Decimal
-from mymath import FuncaoVetorial, Relu, Identidade, Softmax
+from mymath import FuncaoEscalar, Relu, Identidade, Softmax
 
 CAMADA_RELU = 0
 CAMADA_SOFTMAX = 1
@@ -101,16 +101,6 @@ class FeedForwardNet(object):
                self.matrizPesos == other.matrizPesos and \
                self.matrizDesvios == other.matrizDesvios
 
-    def getFuncaoAtivacao(self, tipo):
-        if tipo == CAMADA_RELU:
-            return Relu()
-        elif tipo == CAMADA_SOFTMAX:
-            return Softmax()
-        elif tipo == CAMADA_LINEAR:
-            return Identidade()
-        else:
-            raise Exception('Tipo de camada não disponível')
-
     def alimenta(self, entrada):
         if len(self.tiposCamadas) == 0 or len(self.matrizPesos) != len(self.tiposCamadas):
             raise Exception('Rede nao esta bem definida para esta entrada')
@@ -120,7 +110,6 @@ class FeedForwardNet(object):
         for indiceCamada in range(len(self.tiposCamadas)):
             saida = []
             tipoCamada = self.tiposCamadas[indiceCamada]
-            funcaoAtivacao = self.getFuncaoAtivacao(tipoCamada)
             pesos = self.matrizPesos[indiceCamada]
             desvios = self.matrizDesvios[indiceCamada]
             for indiceNeuronioReceptor in range(len(pesos)):
@@ -130,21 +119,34 @@ class FeedForwardNet(object):
                 elemento += desvios[indiceNeuronioReceptor]
                 saida.append(elemento)
             zMatriz.append(saida[:])
-            saida = funcaoAtivacao.avalia(saida)
+            saida = self.executaFuncaoAtivacaoPorCamada(saida, tipoCamada)
             aMatriz.append(saida[:])
             entrada = saida
         return saida, zMatriz, aMatriz
+
+    def executaFuncaoAtivacaoPorCamada(self, neuronios, tipoCamada):
+        if tipoCamada == CAMADA_RELU:
+            funcaoAtivacao = Relu()
+            saida = [funcaoAtivacao.avalia([n]) for n in neuronios]
+        elif tipoCamada == CAMADA_SOFTMAX:
+            saida = [Softmax(i).avalia(neuronios) for i in range(len(neuronios))]
+        elif tipoCamada == CAMADA_LINEAR:
+            funcaoAtivacao = Identidade()
+            saida = [funcaoAtivacao.avalia([n]) for n in neuronios]
+        else:
+            raise Exception('Tipo de camada não disponível')
+        return saida
 
     def treina(self, taxaAprendizado, entrada, funcaoObjetivo):
         saida, zMatriz, aMatriz = self.alimenta(entrada)
         delta = []
         for indiceCamada in list(range(len(self.tiposCamadas))).reverse():
             tipoCamada = self.tiposCamadas[indiceCamada]
-            funcaoAtivacao = self.getFuncaoAtivacao(tipoCamada)
+            # funcaoAtivacao = self.getFuncaoAtivacao(tipoCamada)
             
-            if indiceCamada == len(self.tiposCamadas) - 1:
-                grad = funcaoObjetivo.gradiente(saida)
-                ativacaoLinha = funcaoAtivacao.
+            # if indiceCamada == len(self.tiposCamadas) - 1:
+            #     grad = funcaoObjetivo.gradiente(saida)
+            #     ativacaoLinha = funcaoAtivacao.
     
     def getReprGenetica(self):
         floatsPesos = []

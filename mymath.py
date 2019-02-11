@@ -26,7 +26,7 @@ class VetorUtil(object):
             raise Exception('Vetores de tamanhos diferentes')
         return [f(v1[i], v2[i]) for i in range(len(v1))]
 
-class FuncaoVetorial(object):
+class FuncaoEscalar(object):
     
     def __init__(self, f):
         self.f = f
@@ -34,12 +34,17 @@ class FuncaoVetorial(object):
     def avalia(self, v):
         return self.f(v)
 
+    def derivada(self, v):
+        if len(v) != 1:
+            raise Exception('derivada está definida apenas para funções de uma variável')
+        return self.derivadaParcial(v, 0)
+
     def derivadaParcial(self, v, i):
         eps = [Decimal(0) if vi != i else EPSILON for vi in range(len(v))]
         h2 = self.avalia(v)
         h1 = self.avalia(VetorUtil.subtrai(v, eps))
-        delta = VetorUtil.subtrai(h2, h1)
-        derivada = VetorUtil.divisaoHadamard(delta, eps)
+        delta = h2 - h1
+        derivada = delta / eps
         return derivada
     
     def gradiente(self, v):
@@ -48,35 +53,37 @@ class FuncaoVetorial(object):
             g.append(self.derivadaParcial(v, i))
         return g
 
-class Relu(FuncaoVetorial):
+class Relu(FuncaoEscalar):
     def __init__(self):
         super(Relu, self).__init__(self.funcao)
 
-    def funcao(self, vetor):
-        f = lambda v: Decimal(0) if v < 0 else v
-        return list(map(f, vetor))
+    def funcao(self, variaveis):
+        if len(variaveis) != 1:
+            raise Exception('ReLU é função de apenas uma variável')
+        return Decimal(0) if variaveis[0] < 0 else variaveis[0]
 
-class Identidade(FuncaoVetorial):
+class Identidade(FuncaoEscalar):
     def __init__(self):
         super(Identidade, self).__init__(self.funcao)
 
-    def funcao(self, vetor):
-        f = lambda v: v
-        return list(map(f, vetor))
+    def funcao(self, variaveis):
+        if len(variaveis) != 1:
+            raise Exception('Funcao Identidade é função de apenas uma variável')
+        return variaveis[0]
 
-class Softmax(FuncaoVetorial):
-    def __init__(self):
+class Softmax(FuncaoEscalar):
+    def __init__(self, indiceNumerador):
         super(Softmax, self).__init__(self.funcao)
+        self.indiceNumerador = indiceNumerador
 
-    def funcao(self, vetor):
-        vetor = list(map(lambda x: x.exp(), vetor))
-        soma = sum(vetor)
-        vetor = list(map(lambda v: v / soma, vetor))
-        return vetor
+    def funcao(self, variaveis):
+        ex = list(map(lambda x: x.exp(), variaveis))
+        soma = sum(ex)
+        return variaveis[self.indiceNumerador].exp() / soma
 
 def main():
     fv = Relu()
-    print(fv.avalia([Decimal(-3)]))
+    print(fv.avalia([Decimal(3)]))
 
 if __name__ == '__main__':
     main()

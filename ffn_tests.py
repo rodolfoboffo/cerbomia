@@ -93,8 +93,8 @@ class FFNBuilderTest2(unittest.TestCase):
 class FuncoesAtivacao(unittest.TestCase):
 
     def test_relu(self):
-        self.assertEqual(Relu().avalia([6.0, -2.0]), [6.0, 0.0], 'ReLu nao está correto.')
-        self.assertEqual(Relu().avalia([-1.0]), [0.0], 'ReLu nao está correto.')
+        self.assertEqual(Relu().avalia([6.0]), 6.0, 'ReLu nao está correto.')
+        self.assertEqual(Relu().avalia([-1.0]), 0.0, 'ReLu nao está correto.')
 
 if __name__ == '__main__':
     unittest.main()
