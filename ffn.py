@@ -115,6 +115,8 @@ class FeedForwardNet(object):
         if len(self.tiposCamadas) == 0 or len(self.matrizPesos) != len(self.tiposCamadas):
             raise Exception('Rede nao esta bem definida para esta entrada')
         
+        zMatriz = []
+        aMatriz = []
         for indiceCamada in range(len(self.tiposCamadas)):
             saida = []
             tipoCamada = self.tiposCamadas[indiceCamada]
@@ -127,12 +129,22 @@ class FeedForwardNet(object):
                     elemento += pesos[indiceNeuronioReceptor][indiceNeuronioTransm] * entrada[indiceNeuronioTransm]
                 elemento += desvios[indiceNeuronioReceptor]
                 saida.append(elemento)
+            zMatriz.append(saida[:])
             saida = funcaoAtivacao.avalia(saida)
+            aMatriz.append(saida[:])
             entrada = saida
-        return saida
+        return saida, zMatriz, aMatriz
 
-    def treinaOnLine(self, taxaAprendizado, entrada, esperado, funcaoObjetivo):
-        pass
+    def treina(self, taxaAprendizado, entrada, funcaoObjetivo):
+        saida, zMatriz, aMatriz = self.alimenta(entrada)
+        delta = []
+        for indiceCamada in list(range(len(self.tiposCamadas))).reverse():
+            tipoCamada = self.tiposCamadas[indiceCamada]
+            funcaoAtivacao = self.getFuncaoAtivacao(tipoCamada)
+            
+            if indiceCamada == len(self.tiposCamadas) - 1:
+                grad = funcaoObjetivo.gradiente(saida)
+                ativacaoLinha = funcaoAtivacao.
     
     def getReprGenetica(self):
         floatsPesos = []

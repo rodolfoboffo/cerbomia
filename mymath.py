@@ -41,6 +41,12 @@ class FuncaoVetorial(object):
         delta = VetorUtil.subtrai(h2, h1)
         derivada = VetorUtil.divisaoHadamard(delta, eps)
         return derivada
+    
+    def gradiente(self, v):
+        g = []
+        for i in range(len(v)):
+            g.append(self.derivadaParcial(v, i))
+        return g
 
 class Relu(FuncaoVetorial):
     def __init__(self):

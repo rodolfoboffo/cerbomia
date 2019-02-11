@@ -32,7 +32,7 @@ class FeedForwardNetTest(unittest.TestCase):
 
     def test_avaliaSaida(self):
         entrada = [Decimal(1), Decimal(2)]
-        saida = self.ffn.alimenta(entrada)
+        saida, _, _ = self.ffn.alimenta(entrada)
         #[5.0, 7.0, 3.0]
         #[15.0, 17.0]
         saidaEsperada = [
